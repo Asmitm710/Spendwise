@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Transaction History</h1>
+
+<div class="panel">
+  {% if expenses %}
+    <table>
+      <tr>
+        <th>Date</th><th>Title</th><th>Category</th><th>Notes</th><th class="right">Amount</th>
+      </tr>
+      {% for e in expenses %}
+      <tr>
+        <td>{{ e.date }}</td>
+        <td>{{ e.title }}</td>
+        <td>{{ e.category }}</td>
+        <td class="muted">{{ e.notes or "—" }}</td>
+        <td class="right">₹{{ "%.2f"|format(e.amount) }}</td>
+      </tr>
+      {% endfor %}
+    </table>
+  {% else %}
+    <p class="muted">No transactions yet. <a href="{{ url_for('add_expense') }}">Add one</a>.</p>
+  {% endif %}
+</div>
+{% endblock %}

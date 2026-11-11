@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Dashboard</h1>
+
+<div class="cards">
+  <div class="card">
+    <p class="label">Total Spent</p>
+    <h2>₹{{ "%.2f"|format(total) }}</h2>
+  </div>
+  <div class="card">
+    <p class="label">Transactions</p>
+    <h2>{{ count }}</h2>
+  </div>
+  <div class="card">
+    <p class="label">Top Category</p>
+    <h2>{{ top_category }}</h2>
+  </div>
+</div>
+
+<div class="panel">
+  <h3>Spending by Category</h3>
+  {% if by_category %}
+    {% for cat, amt in by_category.items() %}
+      <div class="bar-row">
+        <span>{{ cat }}</span>
+        <div class="bar">
+          <div class="fill" style="width: {{ (amt / total * 100)|round }}%"></div>
+        </div>
+        <span>₹{{ "%.2f"|format(amt) }}</span>
+      </div>
+    {% endfor %}
+  {% else %}
+    <p class="muted">No data yet. <a href="{{ url_for('add_expense') }}">Add your first expense</a>.</p>
+  {% endif %}
+</div>
+
+<div class="panel">
+  <h3>Recent Transactions</h3>
+  {% if recent %}
+    <table>
+      <tr>
+        <th>Date</th><th>Title</th><th>Category</th><th class="right">Amount</th>
+      </tr>
+      {% for e in recent %}
+      <tr>
+        <td>{{ e.date }}</td>
+        <td>{{ e.title }}</td>
+        <td>{{ e.category }}</td>
+        <td class="right">₹{{ "%.2f"|format(e.amount) }}</td>
+      </tr>
+      {% endfor %}
+    </table>
+  {% else %}
+    <p class="muted">Nothing here yet.</p>
+  {% endif %}
+</div>
+{% endblock %}
