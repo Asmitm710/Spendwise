@@ -4,33 +4,37 @@
 
 <div class="cards">
   <div class="card">
-    <p class="label">Total Spent</p>
-    <h2>₹{{ "%.2f"|format(total) }}</h2>
+    <p class="label">Total Income</p>
+    <h2 class="income">₹{{ "%.2f"|format(income) }}</h2>
+  </div>
+  <div class="card">
+    <p class="label">Total Expenses</p>
+    <h2 class="expense">₹{{ "%.2f"|format(expense) }}</h2>
+  </div>
+  <div class="card">
+    <p class="label">Balance</p>
+    <h2 class="{{ 'income' if balance >= 0 else 'expense' }}">₹{{ "%.2f"|format(balance) }}</h2>
   </div>
   <div class="card">
     <p class="label">Transactions</p>
     <h2>{{ count }}</h2>
   </div>
-  <div class="card">
-    <p class="label">Top Category</p>
-    <h2>{{ top_category }}</h2>
-  </div>
 </div>
 
 <div class="panel">
   <h3>Spending by Category</h3>
-  {% if by_category %}
+  {% if by_category and expense > 0 %}
     {% for cat, amt in by_category.items() %}
       <div class="bar-row">
         <span>{{ cat }}</span>
         <div class="bar">
-          <div class="fill" style="width: {{ (amt / total * 100)|round }}%"></div>
+          <div class="fill" style="width: {{ (amt / expense * 100)|round }}%"></div>
         </div>
         <span>₹{{ "%.2f"|format(amt) }}</span>
       </div>
     {% endfor %}
   {% else %}
-    <p class="muted">No data yet. <a href="{{ url_for('add_expense') }}">Add your first expense</a>.</p>
+    <p class="muted">No expenses yet. <a href="{{ url_for('add_expense') }}">Add one</a>.</p>
   {% endif %}
 </div>
 
@@ -46,7 +50,9 @@
         <td>{{ e.date }}</td>
         <td>{{ e.title }}</td>
         <td>{{ e.category }}</td>
-        <td class="right">₹{{ "%.2f"|format(e.amount) }}</td>
+        <td class="right {{ e.type }}">
+          {{ "+" if e.type == "income" else "−" }}₹{{ "%.2f"|format(e.amount) }}
+        </td>
       </tr>
       {% endfor %}
     </table>

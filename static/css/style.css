@@ -81,3 +81,39 @@ button:hover { background: #16a34a; }
 .alert.success { background: #052e16; color: #4ade80; }
 .alert.error { background: #3b0a0a; color: #f87171; }
 a { color: #22c55e; }
+/* ---------- Day 3 additions ---------- */
+.income { color: #4ade80; }
+.expense { color: #f87171; }
+
+.radio-group { display: flex; gap: 12px; }
+form label.radio {
+  display: flex; align-items: center; gap: 8px;
+  margin: 0; padding: 10px 16px; cursor: pointer;
+  border: 1px solid #2a3643; border-radius: 8px;
+}
+form label.radio input { width: auto; }
+
+.form-actions { display: flex; align-items: center; gap: 16px; margin-top: 20px; }
+.form-actions button { margin-top: 0; }
+.btn-link { color: #8b98a5; text-decoration: none; }
+.btn-link:hover { color: #e6e8eb; }
+
+.filters { display: flex; gap: 10px; align-items: center; margin-bottom: 16px; flex-wrap: wrap; }
+.filters select { width: auto; min-width: 160px; }
+
+.btn-small {
+  display: inline-block; margin: 0; padding: 6px 12px; font-size: 0.85rem;
+  background: #1f2933; color: #e6e8eb; border: 1px solid #2a3643;
+  border-radius: 6px; text-decoration: none; font-weight: 500; cursor: pointer;
+}
+.btn-small:hover { background: #2a3643; }
+.btn-danger { color: #f87171; }
+.btn-danger:hover { background: #3b0a0a; }
+
+.actions { white-space: nowrap; }
+.actions form { display: inline; }
+
+.summary-row {
+  display: flex; gap: 24px; flex-wrap: wrap; justify-content: flex-end;
+  margin-top: 16px; padding-top: 14px; border-top: 1px solid #1f2933;
+}
