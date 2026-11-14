@@ -117,3 +117,21 @@ form label.radio input { width: auto; }
   display: flex; gap: 24px; flex-wrap: wrap; justify-content: flex-end;
   margin-top: 16px; padding-top: 14px; border-top: 1px solid #1f2933;
 }
+/* ---------- Day 4 additions ---------- */
+.links { display: flex; align-items: center; }
+.user-name { margin-left: 20px; color: #8b98a5; }
+.logout-form { display: inline; margin-left: 12px; }
+
+.auth-box { max-width: 420px; margin: 40px auto; }
+button.full { width: 100%; }
+.hint { margin-top: 6px; }
+.switch { margin-top: 18px; text-align: center; }
+
+.chart-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
+  gap: 16px;
+  margin-bottom: 24px;
+}
+.chart-grid .panel { margin-bottom: 0; }
+.chart-box { position: relative; height: 300px; }

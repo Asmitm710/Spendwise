@@ -10,9 +10,18 @@
   <nav class="navbar">
     <div class="logo">💸 Spendwise</div>
     <div class="links">
-      <a href="{{ url_for('dashboard') }}">Dashboard</a>
-      <a href="{{ url_for('add_expense') }}">Add Expense</a>
-      <a href="{{ url_for('history') }}">History</a>
+      {% if g.user %}
+        <a href="{{ url_for('dashboard') }}">Dashboard</a>
+        <a href="{{ url_for('add_expense') }}">Add Expense</a>
+        <a href="{{ url_for('history') }}">History</a>
+        <span class="user-name">👤 {{ g.user.name }}</span>
+        <form method="POST" action="{{ url_for('logout') }}" class="logout-form">
+          <button type="submit" class="btn-small">Logout</button>
+        </form>
+      {% else %}
+        <a href="{{ url_for('login') }}">Login</a>
+        <a href="{{ url_for('register') }}">Register</a>
+      {% endif %}
     </div>
   </nav>
 

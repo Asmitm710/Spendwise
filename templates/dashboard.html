@@ -21,21 +21,21 @@
   </div>
 </div>
 
-<div class="panel">
-  <h3>Spending by Category</h3>
-  {% if by_category and expense > 0 %}
-    {% for cat, amt in by_category.items() %}
-      <div class="bar-row">
-        <span>{{ cat }}</span>
-        <div class="bar">
-          <div class="fill" style="width: {{ (amt / expense * 100)|round }}%"></div>
-        </div>
-        <span>₹{{ "%.2f"|format(amt) }}</span>
-      </div>
-    {% endfor %}
-  {% else %}
-    <p class="muted">No expenses yet. <a href="{{ url_for('add_expense') }}">Add one</a>.</p>
-  {% endif %}
+<div class="chart-grid">
+  <div class="panel">
+    <h3>Monthly Income vs Expenses</h3>
+    <p class="muted hint">Last 6 months</p>
+    <div class="chart-box"><canvas id="monthlyChart"></canvas></div>
+  </div>
+
+  <div class="panel">
+    <h3>Spending by Category</h3>
+    {% if category_values %}
+      <div class="chart-box"><canvas id="categoryChart"></canvas></div>
+    {% else %}
+      <p class="muted">No expenses yet. <a href="{{ url_for('add_expense') }}">Add one</a>.</p>
+    {% endif %}
+  </div>
 </div>
 
 <div class="panel">
@@ -60,4 +60,50 @@
     <p class="muted">Nothing here yet.</p>
   {% endif %}
 </div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+<script>
+  Chart.defaults.color = "#8b98a5";
+  Chart.defaults.borderColor = "#1f2933";
+
+  // ---- Monthly bar chart ----
+  new Chart(document.getElementById("monthlyChart"), {
+    type: "bar",
+    data: {
+      labels: {{ month_labels|tojson }},
+      datasets: [
+        { label: "Income", data: {{ monthly_income|tojson }}, backgroundColor: "#22c55e", borderRadius: 4 },
+        { label: "Expenses", data: {{ monthly_expense|tojson }}, backgroundColor: "#f87171", borderRadius: 4 }
+      ]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      scales: { y: { beginAtZero: true } },
+      plugins: { legend: { position: "bottom" } }
+    }
+  });
+
+  // ---- Category doughnut chart ----
+  const categoryCanvas = document.getElementById("categoryChart");
+  if (categoryCanvas) {
+    new Chart(categoryCanvas, {
+      type: "doughnut",
+      data: {
+        labels: {{ category_labels|tojson }},
+        datasets: [{
+          data: {{ category_values|tojson }},
+          backgroundColor: ["#22c55e", "#38bdf8", "#f59e0b", "#f87171", "#a78bfa", "#ec4899", "#94a3b8"],
+          borderColor: "#111820",
+          borderWidth: 2
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: { legend: { position: "bottom" } }
+      }
+    });
+  }
+</script>
 {% endblock %}
