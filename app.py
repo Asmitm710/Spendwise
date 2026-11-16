@@ -449,12 +449,8 @@ def check_database():
 
 @app.route("/health")
 def health():
-    """Public endpoint. Render and uptime tools call this to see if the app is alive."""
-    db_ok, _ = check_database()
-    return {
-        "status": "ok",
-        "database": "connected" if db_ok else "unreachable",
-    }, 200
+    """Fast liveness check for Render. No database call, so it answers instantly."""
+    return {"status": "ok"}, 200
 
 
 @app.route("/status")
