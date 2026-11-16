@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>System Status</h1>
+
+<div class="panel">
+  <p class="{{ 'income' if db_ok else 'expense' }}">
+    {{ "● All systems working" if db_ok else "● Database connection problem" }}
+  </p>
+  <table>
+    {% for label, value in info %}
+    <tr>
+      <td class="muted">{{ label }}</td>
+      <td class="right">{{ value }}</td>
+    </tr>
+    {% endfor %}
+  </table>
+  <p class="muted hint">Counters reset whenever the server restarts or wakes up from sleep.</p>
+</div>
+{% endblock %}

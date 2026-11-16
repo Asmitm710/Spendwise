@@ -1,5 +1,8 @@
 import os
 import re
+import sys
+import time
+import threading
 from datetime import date, datetime, timedelta, timezone
 from functools import wraps
 
@@ -12,7 +15,7 @@ from pymongo.errors import DuplicateKeyError
 from bson.objectid import ObjectId
 from bson.errors import InvalidId
 
-from db import users, expenses
+from db import client, users, expenses
 
 load_dotenv()
 
@@ -26,6 +29,9 @@ app.config.update(
     SESSION_COOKIE_SAMESITE="Lax",
     PERMANENT_SESSION_LIFETIME=timedelta(days=7),
 )
+# Render sets the RENDER variable automatically. Locally it doesn't exist.
+if os.getenv("RENDER"):
+    app.config["SESSION_COOKIE_SECURE"] = True
 
 CATEGORIES = {
     "expense": ["Food", "Transport", "Shopping", "Bills", "Entertainment", "Health", "Other"],
@@ -412,6 +418,65 @@ def delete_expense(expense_id):
     flash("Transaction not found.", "error")
     return redirect(url_for("history"))
 
+# ---------- Health check and monitoring ----------
 
+START_TIME = time.time()
+stats = {"requests": 0, "errors": 0}
+stats_lock = threading.Lock()
+
+
+@app.after_request
+def count_requests(response):
+    """Counts every page visit (not static files or health checks)."""
+    if request.endpoint not in ("static", "health"):
+        with stats_lock:
+            stats["requests"] += 1
+            if response.status_code >= 500:
+                stats["errors"] += 1
+    return response
+
+
+def check_database():
+    """Returns (is_connected, response_time_in_ms)."""
+    start = time.perf_counter()
+    try:
+        client.admin.command("ping")
+        ok = True
+    except Exception:
+        ok = False
+    return ok, round((time.perf_counter() - start) * 1000)
+
+
+@app.route("/health")
+def health():
+    """Public endpoint. Render and uptime tools call this to see if the app is alive."""
+    db_ok, _ = check_database()
+    return {
+        "status": "ok",
+        "database": "connected" if db_ok else "unreachable",
+    }, 200
+
+
+@app.route("/status")
+@login_required
+def status():
+    """Simple monitoring page for logged-in users."""
+    db_ok, latency = check_database()
+    seconds = int(time.time() - START_TIME)
+    hours, rest = divmod(seconds, 3600)
+    minutes, secs = divmod(rest, 60)
+
+    info = [
+        ("App status", "Running"),
+        ("Database", "Connected" if db_ok else "Unreachable"),
+        ("Database response time", f"{latency} ms"),
+        ("Uptime since last start", f"{hours}h {minutes}m {secs}s"),
+        ("Page requests since start", stats["requests"]),
+        ("Server errors since start", stats["errors"]),
+        ("Python version", sys.version.split()[0]),
+        ("Server time (UTC)", datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S")),
+        ("Your transactions", expenses.count_documents({"user_id": g.user["_id"]})),
+    ]
+    return render_template("status.html", info=info, db_ok=db_ok)
 if __name__ == "__main__":
     app.run(debug=True)
